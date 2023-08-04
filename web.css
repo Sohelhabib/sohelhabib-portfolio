@@ -11,17 +11,17 @@
   --fw-regular: 300;
   --fw-bold: 900;
 
-  --clr-light: #fff;
-  --clr-dark: #303030;
-  --clr-accent: #9a0f98;
+  --clr-light: #000000;
+  --clr-dark: #ffffff;
+  --clr-accent: #042d02;
 
   --fs-h1: 3rem;
   --fs-h2: 2.25rem;
   --fs-h3: 1.25rem;
   --fs-body: 1rem;
 
-  --bs: 0.25em 0.25em 0.75em rgba(0, 0, 0, 0.25),
-    0.125em 0.125em 0.25em rgba(0, 0, 0, 0.15);
+  --bs: 0.25em 0.25em 0.75em rgba(97, 49, 49, 0.25),
+    0.125em 0.125em 0.25em rgba(87, 58, 58, 0.15);
 }
 
 @media (min-width: 800px) {
@@ -69,9 +69,9 @@ strong {
 .btn {
   display: inline-block;
   padding: 0.5em 0.5em;
-  background: #EA99D5;
+  background: #0000008e;
   color: var(--clr-dark);
-  text-decoration: none;
+  text-decoration: rgb(0, 0, 0);
   cursor: pointer;
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -126,7 +126,7 @@ h3 {
   padding: 0.25em 1em;
   font-family: var(--ff-secondary);
   font-weight: 400;
-  color: #fff;
+  color: #ffffff;
   margin-bottom: 1em;
 }
 
@@ -291,8 +291,8 @@ header {
   }
 }
 
-/*      GEARS          
-.my-gears {
+   /*  Impacts of workout         
+.Impacts-of-workout {
   background-color: var(--clr-dark);
   background-image: url(../imgs/k20lens.png);
   background-size: cover;
@@ -300,11 +300,11 @@ header {
   color: var(--clr-light);
   text-align: center;
 }
-.sec__title--mygears {
+.sec__title--Impactsofworkout {
   color: var(--clr-accent);
   position: relative;
 }
-.sec__title--mygears::after {
+.sec__title--Impactsofworkout::after {
   content: '';
   display: block;
   width: 2em;
@@ -322,20 +322,20 @@ header {
   .gear + .gear{
     margin-left: 2em;
   }
-}*/
+}
 
-/*         ABOUT ME          */
-.about-me {
+/*         ABOUT ME          
+.about-us {
   max-width: 1000px;
   margin: 0 auto;
 }
 
-.about-me__img {
+.about-us__img {
   box-shadow: var(--bs);
 }
 
 @media (min-width: 600px) {
-  .about-me {
+  .about-us {
     display: grid;
     grid-template-columns: 1fr 200px;
     grid-template-areas:
@@ -345,11 +345,11 @@ header {
     grid-column-gap: 2em;
   }
 
-  .sec__title--aboutMe {
+  .sec__title--aboutus {
     grid-area: title;
   }
 
-  .sec__descp--about-me {
+  .sec__descp--about-us {
     grid-column: 1 / -1;
     grid-row: 2;
     position: relative;
@@ -359,7 +359,7 @@ header {
     padding-right: calc(200px + 4em);
   }
 
-  .about-me__img {
+  .about-us__img {
     grid-area: img;
     position: relative;
     z-index: 2;
@@ -429,7 +429,7 @@ header {
 }
 
 .footer__mail:hover {
-  text-decoration: underline;
+  text-decoration: black;
 }
 
 .social-list {
