@@ -1,48 +1,52 @@
-
-
 (() => {
-  // ---------- Helpers ----------
   const $ = (q, root = document) => root.querySelector(q);
   const $$ = (q, root = document) => Array.from(root.querySelectorAll(q));
 
-  // ---------- Mobile Nav (body.nav-open) ----------
+  // ===== Mobile Nav (CSS expects body.nav-open) =====
   const navToggle = $(".nav-toggle");
   const navLinks = $$(".nav__link");
 
-  const closeNav = () => document.body.classList.remove("nav-open");
-  const toggleNav = () => document.body.classList.toggle("nav-open");
-
-  if (navToggle) {
-    navToggle.addEventListener("click", () => {
-      toggleNav();
-      const expanded = document.body.classList.contains("nav-open");
-      navToggle.setAttribute("aria-expanded", expanded ? "true" : "false");
-    });
+  function closeNav() {
+    document.body.classList.remove("nav-open");
+    navToggle?.setAttribute("aria-expanded", "false");
   }
 
-  // Close nav when clicking a link (mobile UX)
-  navLinks.forEach((a) => a.addEventListener("click", closeNav));
-
-  // Close nav on Escape
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeNav();
+  navToggle?.addEventListener("click", () => {
+    document.body.classList.toggle("nav-open");
+    const expanded = document.body.classList.contains("nav-open");
+    navToggle.setAttribute("aria-expanded", expanded ? "true" : "false");
   });
 
-  // ---------- Scroll Reveal (.reveal -> .in) ----------
+  navLinks.forEach((a) => a.addEventListener("click", closeNav));
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape") closeNav(); });
+
+  // ===== Scroll Reveal (SAFE: never leave content hidden) =====
   const revealEls = $$(".reveal");
-  if (revealEls.length) {
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("in");
-        });
-      },
-      { threshold: 0.12 }
-    );
-    revealEls.forEach((el) => io.observe(el));
+
+  // Always show everything after 1s no matter what
+  const safetyTimer = setTimeout(() => {
+    revealEls.forEach(el => el.classList.add("in"));
+  }, 1000);
+
+  if (!("IntersectionObserver" in window)) {
+    // No support -> show instantly
+    revealEls.forEach(el => el.classList.add("in"));
+    clearTimeout(safetyTimer);
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
+
+    revealEls.forEach(el => io.observe(el));
+    // keep safetyTimer as backup
   }
 
-  // ---------- Visit Counter (localStorage, GitHub Pages friendly) ----------
+  // ===== Visit Counter (localStorage) =====
   const visitEl = $("#visit-count");
   if (visitEl) {
     const key = "sohel_portfolio_visits";
@@ -52,43 +56,33 @@
     visitEl.textContent = String(next);
   }
 
-  // ---------- Theme Toggle (optional) ----------
-  // If you kept the updated HTML, it has [data-theme-toggle].
+  // ===== Theme Toggle (optional) =====
   const themeBtn = $("[data-theme-toggle]");
   const root = document.documentElement;
 
-  // restore theme if saved
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme === "light" || savedTheme === "dark") {
     root.dataset.theme = savedTheme;
-  } else {
-    // default stays whatever your HTML sets (e.g. data-theme="dark")
-    if (!root.dataset.theme) root.dataset.theme = "dark";
+  } else if (!root.dataset.theme) {
+    root.dataset.theme = "dark";
   }
 
   const syncThemeIcon = () => {
     if (!themeBtn) return;
-    const t = root.dataset.theme === "light" ? "light" : "dark";
-    themeBtn.textContent = t === "light" ? "🌞" : "🌙";
+    themeBtn.textContent = root.dataset.theme === "light" ? "🌞" : "🌙";
   };
-
   syncThemeIcon();
 
-  if (themeBtn) {
-    themeBtn.addEventListener("click", () => {
-      const current = root.dataset.theme === "light" ? "light" : "dark";
-      const next = current === "light" ? "dark" : "light";
-      root.dataset.theme = next;
-      localStorage.setItem("theme", next);
-      syncThemeIcon();
-    });
-  }
+  themeBtn?.addEventListener("click", () => {
+    const next = root.dataset.theme === "light" ? "dark" : "light";
+    root.dataset.theme = next;
+    localStorage.setItem("theme", next);
+    syncThemeIcon();
+  });
 
-  // ---------- Lightbox for Gallery (optional but nice) ----------
-  // Works with your gallery anchors: .portfolio--files containing img
-  // Click opens lightbox unless Ctrl/Cmd is pressed (then it opens Instagram link).
-  // Auto-injects lightbox HTML if missing.
+  // ===== Lightbox (optional) =====
   const galleryItems = $$(".portfolio--files");
+
   if (galleryItems.length) {
     // Inject lightbox if not present
     let lightbox = $("#lightbox");
@@ -105,8 +99,6 @@
       lightbox = lb;
     }
 
-    // Ensure CSS class names match the CSS provided
-    lightbox.classList.add("lightbox");
     const lbImg = $(".lightbox__img", lightbox);
     const lbClose = $(".lightbox__close", lightbox);
 
@@ -128,28 +120,19 @@
 
     galleryItems.forEach((a) => {
       a.addEventListener("click", (e) => {
-        // allow opening Instagram in new tab with ctrl/cmd click
+        // Ctrl/Cmd click = open Instagram link normally
         if (e.ctrlKey || e.metaKey) return;
 
-        // If you added data-full attribute in HTML, use it; otherwise use the <img src="">
-        const full = a.getAttribute("data-full");
-        const img = $("img", a);
-        const src = full || img?.getAttribute("src");
-
-        if (!src) return;
-
         e.preventDefault();
+        const img = $("img", a);
+        const src = a.getAttribute("data-full") || img?.getAttribute("src");
+        if (!src) return;
         openLightbox(src, img?.alt || "Photo");
       });
     });
 
     lbClose?.addEventListener("click", closeLightbox);
-    lightbox.addEventListener("click", (e) => {
-      if (e.target === lightbox) closeLightbox();
-    });
-
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeLightbox();
-    });
+    lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
+    window.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLightbox(); });
   }
 })();
