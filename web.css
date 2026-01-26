@@ -484,3 +484,6 @@ h1,h2,h3{ margin:0; line-height: 1.1; }
   *{ transition: none !important; }
   .reveal{ opacity: 1; transform: none; }
 }
+/* Emergency fallback: never hide content */
+.reveal { opacity: 1 !important; transform: none !important; }
+
